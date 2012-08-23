@@ -11,6 +11,8 @@
 
 module.exports = function(grunt) {
 
+  var stripBanner = require('./lib/comment').stripBanner;
+
   // ==========================================================================
   // TASKS
   // ==========================================================================
@@ -46,7 +48,7 @@ module.exports = function(grunt) {
         }
         // Strip banners if requested.
         if (options.stripBanners) {
-          src = grunt.helper('strip_banner', src, options.stripBanners);
+          src = stripBanner(src, options.stripBanners);
         }
         return src;
       }).join(grunt.util.normalizelf(options.separator));
@@ -57,25 +59,6 @@ module.exports = function(grunt) {
       // Print a success message.
       grunt.log.writeln('File "' + fileObj.dest + '" created.');
     }, this);
-  });
-
-  // Return the given source coude with any leading banner comment stripped.
-  grunt.registerHelper('strip_banner', function(src, options) {
-    if (!options) { options = {}; }
-    var m = [];
-    if (options.line) {
-      // Strip // ... leading banners.
-      m.push('(?:.*\\/\\/.*\\n)*\\s*');
-    }
-    if (options.block) {
-      // Strips all /* ... */ block comment banners.
-      m.push('\\/\\*[\\s\\S]*?\\*\\/');
-    } else {
-      // Strips only /* ... */ block comment banners, excluding /*! ... */.
-      m.push('\\/\\*[^!][\\s\\S]*?\\*\\/');
-    }
-    var re = new RegExp('^\\s*(?:' + m.join('|') + ')\\s*', '');
-    return src.replace(re, '');
   });
 
 };
